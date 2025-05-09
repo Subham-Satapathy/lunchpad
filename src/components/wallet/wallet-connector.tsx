@@ -71,7 +71,7 @@ function WalletComponent() {
         </div>
       )}
       {error && (
-        <p className="text-sm text-destructive mt-2 animate-fade-in">{error}</p>
+        <p className="text-sm text-destructive mt-2 animate-fade-in text-center w-full">{error}</p>
       )}
     </div>
   );

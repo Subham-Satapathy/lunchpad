@@ -5,20 +5,6 @@ import { useWallet as useLazorWallet } from '@lazorkit/wallet';
 import { TransactionInstruction, Transaction } from '@solana/web3.js';
 import dynamic from 'next/dynamic';
 
-// Extend Window interface to include ethereum
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on: (eventName: string, handler: (...args: unknown[]) => void) => void;
-      removeListener: (eventName: string, handler: (...args: unknown[]) => void) => void;
-      isMetaMask?: boolean;
-      selectedAddress?: string | null;
-      networkVersion?: string;
-    };
-  }
-}
-
 // Types
 interface WalletState {
   isConnected: boolean;
@@ -58,6 +44,7 @@ const formatWalletAddress = (address: string | null): string => {
 function WalletProviderComponent({ children }: { children: ReactNode }) {
   const [storedSmartWalletPubkey, setStoredSmartWalletPubkey] = useState<string | null>(null);
   const [debouncedError, setDebouncedError] = useState<string | null>(null);
+  
   const {
     connect: lazorConnect,
     disconnect: lazorDisconnect,
@@ -83,50 +70,20 @@ function WalletProviderComponent({ children }: { children: ReactNode }) {
 
     const timer = setTimeout(() => {
       setDebouncedError(error);
-    }, 100); // Small delay to prevent flash
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [error]);
 
-  // Prevent conflicts with other wallet providers
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    // Check if ethereum property exists and is writable
-    const ethereumDescriptor = Object.getOwnPropertyDescriptor(window, 'ethereum');
-    if (!ethereumDescriptor) return;
-    
-    // Only store and restore if the property is writable
-    if (ethereumDescriptor.writable && ethereumDescriptor.configurable) {
-      const originalEthereum = window.ethereum;
-      
-      // Clean up function
-      return () => {
-        if (originalEthereum) {
-          try {
-            Object.defineProperty(window, 'ethereum', {
-              value: originalEthereum,
-              writable: true,
-              configurable: true
-            });
-          } catch (error) {
-            console.warn('Could not restore ethereum property:', error);
-          }
-        }
-      };
-    }
-  }, []);
-
   // Handle stored pubkey
   useEffect(() => {
-    if (typeof window === 'undefined') return;
     const savedPubkey = sessionStorage.getItem('smartWalletAuthorityPubkey');
     if (savedPubkey) setStoredSmartWalletPubkey(savedPubkey);
   }, []);
 
   // Update stored pubkey
   useEffect(() => {
-    if (typeof window === 'undefined' || !smartWalletAuthorityPubkey) return;
+    if (!smartWalletAuthorityPubkey) return;
     sessionStorage.setItem('smartWalletAuthorityPubkey', smartWalletAuthorityPubkey);
     setStoredSmartWalletPubkey(smartWalletAuthorityPubkey);
   }, [smartWalletAuthorityPubkey]);
