@@ -2,22 +2,77 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, BarChart, Users } from "lucide-react";
+import { CheckCircle, BarChart, Users, Loader2, AlertCircle } from "lucide-react";
+import { useState } from "react";
 
 interface NFTCardProps {
   hasNFT: boolean;
-  onMint: () => void;
+  onMint: () => Promise<void>;
+  isMinting?: boolean;
+  mintError?: string | null;
 }
 
-export function NFTCard({ hasNFT, onMint }: NFTCardProps) {
+type MintingStatus = 'idle' | 'preparing' | 'uploading' | 'minting' | 'confirming' | 'success' | 'error';
+
+export function NFTCard({ hasNFT, onMint, isMinting = false, mintError = null }: NFTCardProps) {
+  const [mintingStatus, setMintingStatus] = useState<MintingStatus>('idle');
+
+  const handleMint = async () => {
+    try {
+      setMintingStatus('preparing');
+      await onMint();
+      setMintingStatus('success');
+    } catch {
+      setMintingStatus('error');
+    }
+  };
+
+  const getStatusMessage = () => {
+    switch (mintingStatus) {
+      case 'preparing':
+        return 'Preparing transaction...';
+      case 'uploading':
+        return 'Uploading metadata...';
+      case 'minting':
+        return 'Minting your NFT...';
+      case 'confirming':
+        return 'Confirming transaction...';
+      case 'success':
+        return 'Successfully minted!';
+      case 'error':
+        return mintError || 'Failed to mint NFT';
+      default:
+        return hasNFT 
+          ? "Your key to participating in exclusive token launches" 
+          : "Mint your access pass to join token launches";
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (mintingStatus) {
+      case 'preparing':
+      case 'uploading':
+      case 'minting':
+      case 'confirming':
+        return <Loader2 className="h-4 w-4 animate-spin" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return hasNFT ? <CheckCircle className="h-4 w-4 text-green-500" /> : <BarChart className="h-4 w-4" />;
+    }
+  };
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-0">
         <CardTitle>Access Pass NFT</CardTitle>
         <CardDescription>
-          {hasNFT 
-            ? "Your key to participating in exclusive token launches" 
-            : "Mint your access pass to join token launches"}
+          {getStatusMessage()}
+          <p className="mt-2 text-xs text-muted-foreground">
+            Note: This NFT is not stored on-chain. We will implement this in future.
+          </p>
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
@@ -68,13 +123,8 @@ export function NFTCard({ hasNFT, onMint }: NFTCardProps) {
                 <div className="flex justify-between items-center pb-2 border-b border-border">
                   <span className="text-muted-foreground">Status</span>
                   <span className={`flex items-center gap-1 ${hasNFT ? 'text-green-500' : 'text-amber-500'}`}>
-                    {hasNFT ? (
-                      <>
-                        <CheckCircle className="h-4 w-4" /> Owned
-                      </>
-                    ) : (
-                      "Not Minted"
-                    )}
+                    {getStatusIcon()}
+                    {hasNFT ? 'Owned' : 'Not Minted'}
                   </span>
                 </div>
                 
@@ -111,9 +161,29 @@ export function NFTCard({ hasNFT, onMint }: NFTCardProps) {
         ) : (
           <div className="w-full flex justify-between items-center">
             <div className="text-muted-foreground">
-              Mint your Access Pass to join token launches
+              {mintError ? (
+                <span className="text-destructive">{mintError}</span>
+              ) : (
+                "Mint your Access Pass to join token launches"
+              )}
             </div>
-            <Button variant="gradient" onClick={onMint}>Mint Now</Button>
+            <Button 
+              variant="gradient" 
+              onClick={handleMint}
+              disabled={isMinting || mintingStatus !== 'idle'}
+            >
+              {isMinting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {mintingStatus === 'preparing' && 'Preparing...'}
+                  {mintingStatus === 'uploading' && 'Uploading...'}
+                  {mintingStatus === 'minting' && 'Minting...'}
+                  {mintingStatus === 'confirming' && 'Confirming...'}
+                </>
+              ) : (
+                "Mint Now"
+              )}
+            </Button>
           </div>
         )}
       </CardFooter>

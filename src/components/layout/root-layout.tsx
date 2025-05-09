@@ -2,34 +2,36 @@
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 interface RootLayoutProps {
   children: React.ReactNode;
-  initialLoggedIn?: boolean;
 }
 
-export function RootLayout({ 
-  children, 
-  initialLoggedIn = false 
-}: RootLayoutProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedIn);
+// Extend Window interface to include our custom property
+declare global {
+  interface Window {
+    toggleLogin: () => void;
+  }
+}
 
+export function RootLayout({ children }: RootLayoutProps) {
   // For demo purposes, we'll provide a function to toggle login state
   const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn);
+    // This is now just a placeholder function for the window object
+    console.log('Toggle login called');
   };
 
   // Expose the login toggle to the window object for demo purposes
   useEffect(() => {
     if (typeof window !== "undefined") {
-      (window as any).toggleLogin = toggleLogin;
+      window.toggleLogin = toggleLogin;
     }
-  }, [isLoggedIn]);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
       <main className="flex-1">
         {children}
       </main>

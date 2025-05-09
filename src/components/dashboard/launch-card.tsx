@@ -68,20 +68,20 @@ export function LaunchCard({ isActive }: LaunchCardProps) {
               </div>
               
               {/* Countdown Timer */}
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                <div className="bg-muted rounded-lg p-3 text-center">
+              <div className="grid grid-cols-4 gap-x-10 justify-center mb-4 py-2">
+                <div className="bg-muted rounded-lg p-3 text-center min-w-[70px] shadow-md">
                   <div className="text-xl font-bold">{formatTimeUnit(timeLeft.days)}</div>
                   <div className="text-xs text-muted-foreground">Days</div>
                 </div>
-                <div className="bg-muted rounded-lg p-3 text-center">
+                <div className="bg-muted rounded-lg p-3 text-center min-w-[70px] shadow-md">
                   <div className="text-xl font-bold">{formatTimeUnit(timeLeft.hours)}</div>
                   <div className="text-xs text-muted-foreground">Hours</div>
                 </div>
-                <div className="bg-muted rounded-lg p-3 text-center">
+                <div className="bg-muted rounded-lg p-3 text-center min-w-[70px] shadow-md">
                   <div className="text-xl font-bold">{formatTimeUnit(timeLeft.minutes)}</div>
                   <div className="text-xs text-muted-foreground">Minutes</div>
                 </div>
-                <div className="bg-muted rounded-lg p-3 text-center">
+                <div className="bg-muted rounded-lg p-3 text-center min-w-[70px] shadow-md">
                   <div className="text-xl font-bold">{formatTimeUnit(timeLeft.seconds)}</div>
                   <div className="text-xs text-muted-foreground">Seconds</div>
                 </div>
@@ -91,22 +91,22 @@ export function LaunchCard({ isActive }: LaunchCardProps) {
             <div className="space-y-4">
               <div className="flex justify-between items-center pb-2 border-b border-border">
                 <span className="text-muted-foreground">Token Price</span>
-                <span>{formatCurrency(0.05, "USDC")}</span>
+                <span>{formatCurrency(0.00001, "SOL")}</span>
               </div>
               
               <div className="flex justify-between items-center pb-2 border-b border-border">
                 <span className="text-muted-foreground">Tokens Available</span>
-                <span>1,000,000 XYZ</span>
+                <span>99.1 XYZ</span>
               </div>
               
               <div className="flex justify-between items-center pb-2 border-b border-border">
                 <span className="text-muted-foreground">Min Purchase</span>
-                <span>{formatCurrency(10, "USDC")}</span>
+                <span>{formatCurrency(0.00001, "SOL")}</span>
               </div>
               
               <div className="flex justify-between items-center pb-2 border-b border-border">
                 <span className="text-muted-foreground">Max Purchase</span>
-                <span>{formatCurrency(5000, "USDC")}</span>
+                <span>{formatCurrency(0.0005, "SOL")}</span>
               </div>
             </div>
           </div>

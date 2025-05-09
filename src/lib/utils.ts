@@ -12,6 +12,10 @@ export function cn(...inputs: ClassValue[]) {
  * Formats a number as currency
  */
 export function formatCurrency(value: number, currency: string = "USD", decimals: number = 2): string {
+  // Use more decimal places for SOL
+  if (currency === "SOL") {
+    return `${value.toFixed(5)} ${currency}`;
+  }
   return `${value.toFixed(decimals)} ${currency}`;
 }
 

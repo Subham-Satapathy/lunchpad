@@ -2,12 +2,12 @@
 
 import { RootLayout } from "@/components/layout/root-layout";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SwapForm } from "@/components/launch/swap-form";
 import { LaunchStats } from "@/components/launch/launch-stats";
 import { useState } from "react";
 import { TransactionConfirmation } from "@/components/launch/transaction-confirmation";
+import { useWallet } from "@/contexts/wallet-context";
 
 export default function LaunchPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -15,19 +15,21 @@ export default function LaunchPage() {
     success: false,
     amount: 0,
     tokens: 0,
+    signature: '',
   });
+  const { } = useWallet();
 
   // Handler for swap submission
   const handleSwapSubmit = (amount: number) => {
-    // Calculate token amount (price is 0.05 USDC per token)
-    const tokenAmount = amount / 0.05;
+    // Calculate token amount (price is 0.0001 SOL per token)
+    const tokenAmount = amount / 0.0001;
     
-    // In a real app, this would call to make the transaction
-    // For this demo, we'll simulate a successful transaction
+    // Update transaction details
     setTransactionDetails({
       success: true,
       amount: amount,
       tokens: tokenAmount,
+      signature: '', // This will be updated by the SwapForm component
     });
     
     // Show the confirmation modal
@@ -35,7 +37,7 @@ export default function LaunchPage() {
   };
 
   return (
-    <RootLayout initialLoggedIn={true}>
+    <RootLayout>
       <Container className="py-12">
         <div>
           <h1 className="text-3xl font-bold font-sora mb-2">XYZ Token Launch</h1>
@@ -58,7 +60,7 @@ export default function LaunchPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Swap USDC for XYZ</CardTitle>
+                <CardTitle>Swap SOL for XYZ</CardTitle>
                 <CardDescription>Participate in the token launch</CardDescription>
               </CardHeader>
               <CardContent>
@@ -66,13 +68,13 @@ export default function LaunchPage() {
               </CardContent>
               <CardFooter className="bg-muted/30 px-6 py-4 flex flex-col items-start">
                 <div className="text-sm text-muted-foreground mb-2">
-                  • Minimum purchase: 10 USDC
+                  • Minimum purchase: 0.00001 SOL
                 </div>
                 <div className="text-sm text-muted-foreground mb-2">
-                  • Maximum purchase: 5,000 USDC
+                  • Maximum purchase: 0.0005 SOL
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  • Token price: 0.05 USDC per XYZ
+                  • Token price: 0.0001 SOL per XYZ
                 </div>
               </CardFooter>
             </Card>

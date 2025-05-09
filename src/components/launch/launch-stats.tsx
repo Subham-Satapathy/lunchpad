@@ -30,7 +30,7 @@ export function LaunchStats() {
                 <span className="text-sm font-medium">Total Raised</span>
               </div>
               <div className="text-xl font-bold">
-                {formatCurrency(42500, "USDC")}
+                {formatCurrency(42, "SOL")}
               </div>
             </div>
             
@@ -40,7 +40,7 @@ export function LaunchStats() {
                 <span className="text-sm font-medium">Token Price</span>
               </div>
               <div className="text-xl font-bold">
-                {formatCurrency(0.05, "USDC")}
+                {formatCurrency(0.00001, "SOL")}
               </div>
             </div>
           </div>
@@ -52,7 +52,7 @@ export function LaunchStats() {
                 <span className="text-sm font-medium">Tokens Left</span>
               </div>
               <div className="text-xl font-bold">
-                150,000
+                99.1
               </div>
             </div>
             
@@ -96,12 +96,12 @@ export function LaunchStats() {
             
             <div className="flex justify-between items-center pb-2 border-b border-border">
               <span className="text-muted-foreground">Min Purchase</span>
-              <span>{formatCurrency(10, "USDC")}</span>
+              <span>{formatCurrency(0.00001, "SOL")}</span>
             </div>
             
             <div className="flex justify-between items-center pb-2 border-b border-border">
               <span className="text-muted-foreground">Max Purchase</span>
-              <span>{formatCurrency(5000, "USDC")}</span>
+              <span>{formatCurrency(0.0005, "SOL")}</span>
             </div>
           </div>
         </div>

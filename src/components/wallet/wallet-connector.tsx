@@ -1,20 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useWallet } from '@lazorkit/wallet';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Wallet, LogOut } from 'lucide-react';
-
-// Helper function to format wallet address
-const formatWalletAddress = (address: string | null): string => {
-  if (!address) return '';
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-};
+import { useWallet } from '@/contexts/wallet-context';
 
 // Client-side wallet component
 function WalletComponent() {
-  const [storedSmartWalletPubkey, setStoredSmartWalletPubkey] = useState<string | null>(null);
   const {
     connect,
     disconnect,
@@ -22,43 +15,8 @@ function WalletComponent() {
     isLoading,
     error,
     smartWalletAuthorityPubkey,
+    formatAddress,
   } = useWallet();
-
-  // Helper function to format error message
-  const formatErrorMessage = (error: string | null): string | null => {
-    if (!error) return null;
-    if (error.includes('Pop up closed unexpectedly')) {
-      return null; // Suppress this error entirely
-    }
-    return error;
-  };
-
-  // Log wallet state changes
-  useEffect(() => {
-    console.log('Wallet State:', {
-      isConnected,
-      isLoading,
-      error,
-      smartWalletAuthorityPubkey,
-      storedSmartWalletPubkey
-    });
-  }, [isConnected, isLoading, error, smartWalletAuthorityPubkey, storedSmartWalletPubkey]);
-
-  // Handle stored pubkey
-  useEffect(() => {
-    const savedPubkey = sessionStorage.getItem('smartWalletAuthorityPubkey');
-    console.log('Retrieved from sessionStorage:', savedPubkey);
-    if (savedPubkey) setStoredSmartWalletPubkey(savedPubkey);
-  }, []);
-
-  // Update stored pubkey
-  useEffect(() => {
-    if (smartWalletAuthorityPubkey) {
-      console.log('New wallet pubkey:', smartWalletAuthorityPubkey);
-      sessionStorage.setItem('smartWalletAuthorityPubkey', smartWalletAuthorityPubkey);
-      setStoredSmartWalletPubkey(smartWalletAuthorityPubkey);
-    }
-  }, [smartWalletAuthorityPubkey]);
 
   return (
     <div className="relative flex items-center justify-center min-h-[80px] w-full">
@@ -77,7 +35,7 @@ function WalletComponent() {
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">
-                {formatWalletAddress(storedSmartWalletPubkey || smartWalletAuthorityPubkey)}
+                {formatAddress(smartWalletAuthorityPubkey)}
               </p>
             </div>
             <Button
@@ -97,8 +55,8 @@ function WalletComponent() {
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent" />
         </div>
       )}
-      {error && formatErrorMessage(error) && (
-        <p className="text-sm text-destructive mt-2">{formatErrorMessage(error)}</p>
+      {error && (
+        <p className="text-sm text-destructive mt-2">{error}</p>
       )}
     </div>
   );

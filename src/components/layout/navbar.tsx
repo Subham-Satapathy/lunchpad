@@ -1,17 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import WalletConnector from "@/components/wallet/wallet-connector";
 
-interface NavbarProps {
-  isLoggedIn?: boolean;
-}
-
-export function Navbar({ isLoggedIn = false }: NavbarProps) {
+export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
