@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, BarChart, Users, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, BarChart, Users, Loader2, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 
 interface NFTCardProps {
@@ -70,10 +70,11 @@ export function NFTCard({ hasNFT, onMint, isMinting = false, mintError = null }:
         <CardTitle>Access Pass NFT</CardTitle>
         <CardDescription>
           {getStatusMessage()}
-          <p className="mt-2 text-xs text-muted-foreground">
-            Note: This NFT is not stored on-chain. We will implement this in future.
-          </p>
         </CardDescription>
+        <div className="mt-2 flex items-center gap-2 text-xs text-amber-500">
+          <AlertTriangle className="h-3 w-3" />
+          <span>Note: This NFT is not stored on-chain. We will implement this in future.</span>
+        </div>
       </CardHeader>
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-8 items-center">
