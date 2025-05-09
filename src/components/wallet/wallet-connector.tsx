@@ -35,7 +35,7 @@ function WalletComponent() {
           size="sm"
           onClick={handleConnect}
           disabled={isLoading}
-          className={`group px-4 py-2 text-base font-medium rounded-lg shadow transition-opacity duration-200 ${
+          className={`group min-w-[120px] text-base font-medium rounded-lg shadow transition-opacity duration-200 ${
             isLoading ? 'opacity-50' : 'opacity-100'
           }`}
         >

@@ -4,18 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import WalletConnector from "@/components/wallet/wallet-connector";
-
+import Image from "next/image";
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="py-4 border-b sticky top-0 backdrop-blur-lg bg-background/70 z-50 w-full">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+    <nav className="h-16 border-b sticky top-0 backdrop-blur-lg bg-background/70 z-50 w-full flex items-center">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        <div className="flex items-center justify-between w-full">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="font-sora font-bold text-xl">Launchpad</span>
+            <Image src="/logo.png" alt="Logo" width={96} height={96} />
           </Link>
-
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex items-center space-x-6">
@@ -38,7 +37,7 @@ export function Navbar() {
                 Your NFTs
               </Link>
             </div>
-            <div className="ml-6">
+            <div className="ml-6 min-w-[120px]">
               <WalletConnector />
             </div>
           </div>
