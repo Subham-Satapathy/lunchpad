@@ -67,7 +67,7 @@ export function SwapForm({ onSubmit }: SwapFormProps) {
         signMessage,
       });
 
-      const result = await tokenService.mintTokens(amount);
+      const result = await tokenService.mintTokensAfterPayment(amount, tokens);
       
       if (result.success && result.signature) {
         toast.success("Successfully minted tokens!");

@@ -21,7 +21,7 @@ function WalletComponent() {
   const handleConnect = async () => {
     try {
       await connect();
-    } catch {
+    } catch (err) {
       // Error is already handled by the wallet context
       console.log('Connection attempt completed');
     }

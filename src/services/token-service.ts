@@ -1,4 +1,17 @@
-import { TransactionInstruction, PublicKey, SystemProgram } from '@solana/web3.js';
+import { 
+  TransactionInstruction, 
+  PublicKey,
+  AccountMeta,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  Transaction,
+  Connection
+} from '@solana/web3.js';
+import { 
+  createMintToInstruction,
+  getAssociatedTokenAddress,
+  TOKEN_PROGRAM_ID 
+} from '@solana/spl-token';
 
 type WalletState = {
   isConnected: boolean;
@@ -8,8 +21,9 @@ type WalletState = {
 
 export class TokenService {
   private wallet: WalletState;
-  private readonly TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
-  private readonly TOKEN_MINT = new PublicKey('2zxa7tkuWYm3o1DBbEFNtHfz6Rr1msaagvPp4P4m7UEK'); // Replace with actual token mint address
+  private readonly PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'); // SPL Token Program
+  private readonly TOKEN_MINT = new PublicKey('2zxa7tkuWYm3o1DBbEFNtHfz6Rr1msaagvPp4P4m7UEK'); // Your token mint address
+  private readonly PAYMENT_ACCOUNT = new PublicKey('BwJspeLwXZWv7ojBjMxYjACEkPBmXPL96szgEKC8XukC'); // Account where SOL will be transferred
 
   constructor(wallet: WalletState) {
     this.wallet = wallet;
@@ -19,77 +33,127 @@ export class TokenService {
     return new TokenService(wallet);
   }
 
-  private createMintInstruction(amount: number): TransactionInstruction {
+  /**
+   * Creates an instruction to transfer SOL (payment)
+   *
+   * @param solAmount - Amount of SOL to transfer as payment
+   * @returns TransactionInstruction
+   */
+  private createSOLPaymentInstruction(solAmount: number): TransactionInstruction {
     if (!this.wallet.smartWalletAuthorityPubkey) {
       throw new Error('Smart wallet authority public key is missing');
     }
 
-    // Convert amount to lamports (1 SOL = 1e9 lamports)
-    const lamports = BigInt(Math.floor(amount * 1e9));
-    const lamportsBuffer = Buffer.alloc(8);
-    lamportsBuffer.writeBigUInt64LE(lamports);
+    const authorityPubkey = new PublicKey(this.wallet.smartWalletAuthorityPubkey);
+    
+    // Convert SOL to lamports
+    const lamports = BigInt(Math.round(solAmount * LAMPORTS_PER_SOL));
 
-    // Create the mint instruction
+    // Create instruction for transferring SOL from the user to the payment account
+    const keys: AccountMeta[] = [
+      { pubkey: authorityPubkey, isSigner: true, isWritable: true }, // User's wallet
+      { pubkey: this.PAYMENT_ACCOUNT, isSigner: false, isWritable: true }, // Payment account
+    ];
+
     return new TransactionInstruction({
-      keys: [
-        {
-          pubkey: new PublicKey(this.wallet.smartWalletAuthorityPubkey),
-          isSigner: true,
-          isWritable: true,
-        },
-        {
-          pubkey: this.TOKEN_MINT,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: SystemProgram.programId,
-          isSigner: false,
-          isWritable: false,
-        },
-      ],
-      programId: this.TOKEN_PROGRAM_ID,
-      data: Buffer.from([
-        7, 
-        ...lamportsBuffer, // Amount in lamports
-      ]),
+      keys,
+      programId: SystemProgram.programId,
+      data: Buffer.from([2, ...new Uint8Array(new BigUint64Array([lamports]).buffer)]), // Transfer SOL
     });
   }
 
-  public async mintTokens(amount: number): Promise<{ success: boolean; signature?: string; error?: string }> {
+  /**
+   * Creates minting instruction for token minting
+   *
+   * @param tokenAmount - Amount of tokens to mint
+   * @returns TransactionInstruction
+   */
+  private async createMintInstruction(tokenAmount: number): Promise<TransactionInstruction> {
+    if (!this.wallet.smartWalletAuthorityPubkey) {
+      throw new Error('Smart wallet authority public key is missing');
+    }
+
+    // Input validation for amounts
+    if (typeof tokenAmount !== 'number' || isNaN(tokenAmount) || tokenAmount <= 0) {
+      throw new Error(`Invalid token amount: ${tokenAmount}. Amount must be a positive number.`);
+    }
+
+    const authorityPubkey = new PublicKey(this.wallet.smartWalletAuthorityPubkey);
+
+    // Convert token amount to smallest unit (multiply by 1e9)
+    const tokenAmountInSmallestUnit = BigInt(Math.round(tokenAmount * 1e9));
+
+    // Create the mintTo instruction to mint tokens to the user's associated token account
+    const instruction = createMintToInstruction(
+      this.TOKEN_MINT,      // Token Mint Address
+      new PublicKey(this.wallet.smartWalletAuthorityPubkey),         // User's token account
+      authorityPubkey,     // Mint authority (the wallet that owns the token minting ability)
+      tokenAmountInSmallestUnit          // The amount of tokens to mint in smallest unit
+    );
+
+    return instruction;
+  }
+
+  /**
+   * Mints tokens only after SOL payment has been made
+   *
+   * @param solAmount - Amount of SOL to pay for minting tokens
+   * @param tokenAmount - Amount of tokens to mint
+   * @returns A promise with the transaction result
+   */
+  public async mintTokensAfterPayment(solAmount: number, tokenAmount: number): Promise<{ success: boolean; signature?: string; error?: string }> {
     try {
       console.log('Starting token mint process...');
-      console.log('Amount to mint:', amount, 'SOL');
+      console.log(`SOL amount to pay: ${solAmount} SOL`);
+      console.log(`XYZ tokens to mint: ${tokenAmount}`);
 
+      // Input validation for amounts
+      if (typeof solAmount !== 'number' || isNaN(solAmount) || solAmount <= 0) {
+        throw new Error(`Invalid SOL amount: ${solAmount}. Amount must be a positive number.`);
+      }
+      if (typeof tokenAmount !== 'number' || isNaN(tokenAmount) || tokenAmount <= 0) {
+        throw new Error(`Invalid token amount: ${tokenAmount}. Amount must be a positive number.`);
+      }
+
+      // Ensure the wallet is connected
       if (!this.wallet.isConnected) {
         console.error('Wallet connection check failed');
         throw new Error('Wallet is not connected');
       }
 
+      // Ensure the wallet has a valid authority public key
       if (!this.wallet.smartWalletAuthorityPubkey) {
         console.error('Smart wallet authority check failed');
         throw new Error('Smart wallet authority public key is missing');
       }
 
-      console.log('Creating mint instruction...');
-      // Create the mint instruction
-      const instruction = this.createMintInstruction(amount);
+      // Create the SOL payment instruction
+      const paymentInstruction = this.createSOLPaymentInstruction(solAmount);
 
-      console.log('Signing and sending transaction...');
-      // Sign and send the transaction using the wallet's signMessage function
-      const signature = await this.wallet.signMessage(instruction);
-      console.log('Transaction signed successfully. Signature:', signature);
+      // Create the mint instruction
+      const mintInstruction = await this.createMintInstruction(tokenAmount);
+
+      // Create a single instruction that combines both operations
+      const combinedInstruction = new TransactionInstruction({
+        keys: [...paymentInstruction.keys, ...mintInstruction.keys],
+        programId: SystemProgram.programId,
+        data: Buffer.concat([paymentInstruction.data, mintInstruction.data])
+      });
+
+      console.log('Signing and sending combined instruction...');
+      const signature = await this.wallet.signMessage(combinedInstruction);
+      console.log('Combined instruction signed successfully. Signature:', signature);
 
       return {
         success: true,
         signature,
       };
     } catch (error) {
-      console.error('Error minting tokens:', error);
+      console.error('Error minting tokens after payment:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
-} 
+}
