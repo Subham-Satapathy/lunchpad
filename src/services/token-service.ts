@@ -4,13 +4,9 @@ import {
   AccountMeta,
   LAMPORTS_PER_SOL,
   SystemProgram,
-  Transaction,
-  Connection
 } from '@solana/web3.js';
 import { 
   createMintToInstruction,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID 
 } from '@solana/spl-token';
 
 type WalletState = {
@@ -21,7 +17,6 @@ type WalletState = {
 
 export class TokenService {
   private wallet: WalletState;
-  private readonly PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'); // SPL Token Program
   private readonly TOKEN_MINT = new PublicKey('2zxa7tkuWYm3o1DBbEFNtHfz6Rr1msaagvPp4P4m7UEK'); // Your token mint address
   private readonly PAYMENT_ACCOUNT = new PublicKey('BwJspeLwXZWv7ojBjMxYjACEkPBmXPL96szgEKC8XukC'); // Account where SOL will be transferred
 
