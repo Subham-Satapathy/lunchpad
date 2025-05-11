@@ -17,7 +17,7 @@ type WalletState = {
 
 export class TokenService {
   private wallet: WalletState;
-  private readonly TOKEN_MINT = new PublicKey('2zxa7tkuWYm3o1DBbEFNtHfz6Rr1msaagvPp4P4m7UEK'); // Your token mint address
+  private readonly TOKEN_MINT = new PublicKey('4fbh2EUuDptWpfZfczRBscaCDBx7DH4ZSWTpSiDrSZWf'); // Your token mint address
   private readonly PAYMENT_ACCOUNT = new PublicKey('BwJspeLwXZWv7ojBjMxYjACEkPBmXPL96szgEKC8XukC'); // Account where SOL will be transferred
 
   constructor(wallet: WalletState) {
