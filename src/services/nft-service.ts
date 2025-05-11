@@ -106,29 +106,23 @@ export class NFTService {
   public async signMessage(message: string): Promise<{ success: boolean; signature?: string; error?: string }> {
     try {
       if (!this.wallet.isConnected) {
-        console.error('Wallet is not connected');
         throw new Error('Wallet is not connected');
       }
 
       if (!this.wallet.smartWalletAuthorityPubkey) {
-        console.error('Smart wallet authority public key is missing');
         throw new Error('Smart wallet authority public key is missing');
       }
 
+      // Create a simple instruction focused just on signing
       const instruction = new TransactionInstruction({
         keys: [
           {
             pubkey: new PublicKey(this.wallet.smartWalletAuthorityPubkey),
             isSigner: true,
-            isWritable: true,
-          },
-          {
-            pubkey: SystemProgram.programId,
-            isSigner: false,
-            isWritable: false,
+            isWritable: false, // No need to write for simple signing
           },
         ],
-        programId: SystemProgram.programId,
+        programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'), // Memo program
         data: Buffer.from(message),
       });
 
@@ -141,8 +135,8 @@ export class NFTService {
       console.error('Error signing message:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
-  }
+}
 } 
