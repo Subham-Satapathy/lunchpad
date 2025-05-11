@@ -2,7 +2,7 @@ import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { fetchDigitalAsset, mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
 import { generateSigner, keypairIdentity, percentAmount, publicKey } from '@metaplex-foundation/umi';
 import { createNft } from '@metaplex-foundation/mpl-token-metadata';
-import { TransactionInstruction, SystemProgram, PublicKey, Transaction } from '@solana/web3.js';
+import { TransactionInstruction, PublicKey, Transaction } from '@solana/web3.js';
 
 // Initialize UMI with the RPC endpoint
 const umi = createUmi('https://rpc.lazorkit.xyz').use(mplTokenMetadata());
