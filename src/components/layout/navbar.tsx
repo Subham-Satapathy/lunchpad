@@ -20,21 +20,15 @@ export function Navbar() {
             <div className="flex items-center space-x-6">
               <Link 
                 href="/dashboard" 
-                className="text-sm font-medium hover:text-primary transition-colors duration-200"
+                className="text-sm font-medium hover:text-muted-foreground transition-colors duration-200"
               >
                 Dashboard
               </Link>
               <Link 
                 href="/launch" 
-                className="text-sm font-medium hover:text-primary transition-colors duration-200"
+                className="text-sm font-medium hover:text-muted-foreground transition-colors duration-200"
               >
                 Launches
-              </Link>
-              <Link 
-                href="/dashboard" 
-                className="text-sm font-medium hover:text-primary transition-colors duration-200"
-              >
-                Your NFTs
               </Link>
             </div>
             <div className="ml-6 min-w-[120px]">
@@ -70,21 +64,21 @@ export function Navbar() {
               <div className="px-4 pb-4 pt-2 space-y-4">
                 <Link 
                   href="/dashboard" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors duration-200"
+                  className="block py-2 text-sm font-medium hover:text-muted-foreground transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   href="/launch" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors duration-200"
+                  className="block py-2 text-sm font-medium hover:text-muted-foreground transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Launches
                 </Link>
                 <Link 
                   href="/dashboard" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors duration-200"
+                  className="block py-2 text-sm font-medium hover:text-muted-foreground transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Your NFTs

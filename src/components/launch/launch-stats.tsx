@@ -91,7 +91,7 @@ export function LaunchStats() {
             
             <div className="flex justify-between items-center pb-2 border-b border-border">
               <span className="text-muted-foreground">End Date</span>
-              <span>May 12, 2025</span>
+              <span>May 30, 2025</span>
             </div>
             
             <div className="flex justify-between items-center pb-2 border-b border-border">
